@@ -75,7 +75,7 @@
     displayManager = {
         sddm.enable = true;
 	# Iniciar com o AwesomeDM 
-        #defaultSession = "none+awesome";
+        defaultSession = "none+awesome";
     };
 
     # X11 keymap
@@ -114,7 +114,14 @@
      "\${HOME}/.local/bin"
    ];
    NIXPKGS_ALLOW_UNFREE = "1";
-  }
+  };
+
+  environment.interactiveShellInit = ''
+  alias blackbox='flatpak run com.raggesilver.BlackBox'
+  '';
+  
+  programs.dconf.enable = true;
+
 
 
   #Variáveis de ambiente para o hyperland (WIP)

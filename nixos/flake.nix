@@ -1,50 +1,57 @@
 {
-	description = "A very basic flake";
+  description = "A basic home manager setup";
+  
+ inputs = {
+  nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
+  home-manager = {
+   url = github:nix-community/home-manager;
+   inputs.nixpkgs.follows = "nixpkgs";
+  };
+};
 
-	inputs = {
-		nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
-		hyprland.url = "github:hyprwm/Hyprland";
-		home-manager = {
-			url = "github:nix-community/home-manager";
-			inputs.nixpkgs.follows = "nixpkgs";
-		};
-	};
+  outputs = { self, nixpkgs, home-manager, ...}: 
+   let
+     hostname = "nixos";
+     username = "enzo";
+     system = "x86_64-linux";
+     pkgs = import nixpkgs {
+	inherit system;
+	config.allowUnfree = true;	
+     };
+     lib = nixpkgs.lib;
+in {
+ nixosConfigurations = {
+  enzo = lib.nixosSystem {
+   inherit system;
+   modules = [ 
+    ./configuration.nix
+    home-manager.nixosModules.home-manager {
+     home-manager.useGlobalPkgs = true;
+     home-manager.useUserPackages = true;
+     home-manager.users.enzo = {
+	imports = [ ./home.nix ];
+     };
+    }
+   ];
+  };
+ };
+ hmConfig = {
+  inherit system;
+  enzo = home-manager.lib.homeManagerConfiguration {
+   pkgs = nixpkgs.legacyPackages.${system};
+  modules = [
+    ./home.nix
+    {
+      home = {
+        username = "enzo";
+        homeDirectory = "/home/enzo";
+        stateVersion = "22.11";
+      };
+    }
+  ];
 
-	outputs = {
-		self,
-		nixpkgs,
-		home-manager,
-		hyprland,
-		...
-	}: let
-		system = "x86_64-linux";
-
-		imports = [ ./patches/default.nix ];
-
-		pkgs = import nixpkgs {
-			inherit system;
-			config.allowUnfree = true;
-		};
-	lib = nixpkgs.lib;
-
-	in {
-		nixosConfigurations = {
-			silverdev2482 = lib.nixosSystem {
-				inherit system pkgs;
-				modules = [
-					./configuration.nix
-					home-manager.nixosModules.home-manager
-						{
-						home-manager.useGlobalPkgs = true;
-						home-manager.useUserPackages = true;
-						home-manager.users.silverdev2482 = {
-							imports = [./home.nix];
-						};
-					}
-					hyprland.nixosModules.default
-					{programs.hyprland.enable = true;}
-				];
-			};
-		};
-	};
+   };
+  };
+ };
+ 
 }

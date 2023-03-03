@@ -18,6 +18,22 @@
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
-
-  home.packages = with pkgs; [ htop exa ranger ];
+  gtk = {
+    enable = true;
+    theme = {
+      name = "Materia-dark";
+      package = pkgs.materia-theme;
+    };
+  };
+  home.packages = with pkgs; [ 
+	htop 
+	exa 
+	ranger
+	alacritty
+	tty-clock
+	polybar
+	picom
+	kmix
+	networkmanagerapplet 
+];
 }

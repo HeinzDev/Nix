@@ -53,31 +53,12 @@ terminal = "termite"
 editor = os.getenv("nvim") or "nano"
 editor_cmd = terminal .. " -e " .. editor
 
--- Default modkey.
--- Usually, Mod4 is the key with a logo between Control and Alt.
--- If you do not like this or do not have such a key,
--- I suggest you to remap Mod4 to another key using xmodmap or other tools.
--- However, you can use another modifier like Mod1, but it may interact with others.
 modkey = "Mod4"
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 awful.layout.layouts = {
-    --awful.layout.suit.floating,
     awful.layout.suit.tile,
-    --awful.layout.suit.tile.left,
-    --awful.layout.suit.tile.bottom,
-    --awful.layout.suit.tile.top,
-    --awful.layout.suit.fair,
-    --awful.layout.suit.fair.horizontal,
-    awful.layout.suit.spirail,
-    --awful.layout.suit.spiral.dwindle,
-    --awful.layout.suit.max,
-    --awful.layout.suit.max.fullscreen,
-    --awful.layout.suit.magnifier,
-    --awful.layout.suit.corner.nw,
-    -- awful.layout.suit.corner.ne,
-    -- awful.layout.suit.corner.sw,
-    -- awful.layout.suit.corner.se,
+    awful.layouout.suit.spiral.dwindle,
 }
 -- }}}
 
@@ -101,7 +82,7 @@ beautiful.menu_height=20
 beautiful.menu_width=180
 beautiful.menu_bg_normal="#21232d"
 beautiful.menu_bg_focus="#38334b"
-beautiful.menu_fg_normal="#21232d"
+beautiful.menu_fg_normal="#777b8f"
 --beatiful.menu_fg_focus= ""
 
 mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
@@ -116,27 +97,6 @@ mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesom
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
 -- }}}
 
-
---local function set_wallpaper(s)
-    -- Wallpaper
---    if beautiful.wallpaper then
---        local wallpaper = beautiful.wallpaper
-        -- If wallpaper is a function, call it with the screen
---        if type(wallpaper) == "function" then
---            wallpaper = wallpaper(s)
---        end
---        gears.wallpaper.maximized(wallpaper, s, true)
---    end
---end
-
--- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
---screen.connect_signal("property::geometry", set_wallpaper)
-
---awful.screen.connect_for_each_screen(function(s)
-    -- Wallpaper
---    set_wallpaper(s)
-
-    -- Each screen has its own tag table.
     awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[1])
 
 --end)
@@ -160,6 +120,39 @@ globalkeys = gears.table.join(
               {description = "view next", group = "tag"}),
     awful.key({ modkey,           }, "Escape", awful.tag.history.restore,
               {description = "go back", group = "tag"}),
+
+
+    awful.key({ modkey, "Shift"   }, "t", function ()
+    --[[ local notif_icon = gears.surface.load_uncached(
+                       gears.filesystem.get_configuration_dir() .. "path/to/icon") ]]
+
+	local rrect = function(radius)
+		return 	function(cr, width, height)
+				  gears.shape.rounded_rect(cr, width, height, radius)
+				end
+	end
+
+    naughty.notify({
+        -- screen = 1,
+        -- timeout = 0,-- in seconds
+        -- ignore_suspend = true,-- if true notif shows even if notifs are suspended via naughty.suspend
+        fg = "#b1b1f2",
+        bg = "#1e1e2a",
+	margin = 6,
+	width = 240,
+	height = 70,
+	opacity = 60,
+	--shape = gears.shape.rounded_rect(cr,w,h,5),
+        title = "Test Title",
+        text = "Test Notification",
+        icon = gears.color.recolor_image(notif_icon, "#ff0"),
+        icon_size = 24,-- in px
+        border_color = "#ab2e5c",
+        border_width = 1,
+	shape = rrect(7)
+    })
+end,
+    {description = "send test notification", group = "awesome"}),
 
     awful.key({ modkey,           }, "j",
         function ()
@@ -429,21 +422,16 @@ client.connect_signal("manage", function (c)
     end
 end)
 
--- Enable sloppy focus, so that focus follows mouse.
---client.connect_signal("mouse::enter", function(c)
---    c:emit_signal("request::activate", "mouse_enter", {raise = false})
---end)
-
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
 -- Autostart
 awful.spawn.with_shell("picom")
 awful.spawn.with_shell("nitrogen --restore")
+awful.spawn.with_shell("kmix")
+awful.spawn.with_shell("nm-applet")
 awful.spawn.with_shell("xrandr --output DP-0 --mode 1920x1080 --rate 165.00")
 awful.spawn.with_shell("source /home/enzo/.config/awesome/launch.sh")
 
--- Gaps
---beautiful.useless_gap = 12
 beautiful.init("/home/enzo/.config/awesome/theme.lua")
 
